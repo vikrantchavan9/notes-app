@@ -5,9 +5,13 @@ import connectDB from './config/db';
 import userRoutes from './routes/userRoutes';
 import noteRoutes from './routes/noteRoutes';
 import passport from 'passport'; 
-import './config/passport'; 
 
 dotenv.config();
+
+console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID); 
+
+import './config/passport'; 
+
 connectDB();
 
 const app = express();
