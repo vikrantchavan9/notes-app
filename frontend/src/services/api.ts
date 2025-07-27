@@ -45,6 +45,18 @@ export const registerUser = async (userData: RegisterData) => {
   }
 };
 
+export const requestLoginOtp = async (email: string) => {
+    try {
+        const { data } = await apiClient.post('/users/login', { email });
+        return data; // Returns a success message
+    } catch (error: unknown) {
+        if (axios.isAxiosError(error) && error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw new Error('An unknown error occurred while requesting OTP.');
+    }
+};
+
 export const verifyOtp = async (email: string, otp: string) => {
   try {
     const { data } = await apiClient.post('/users/verify-otp', { email, otp });

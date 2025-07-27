@@ -1,20 +1,67 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate  } from 'react-router-dom';
+
 import LogoIcon from '../assets/icon.png';
 import abstractBg from '../assets/right-column.png';
 import EyeOpenIcon from '../assets/open-eye-icon.png'; 
-import EyeClosedIcon from '../assets/eye-icon.png'; // Your custom image is imported
+import EyeClosedIcon from '../assets/eye-icon.png';
+
+import { requestLoginOtp, verifyOtp } from '../services/api';
+import { useAuth } from '../hooks/useAuth';
+
 
 const SignInPage: React.FC = () => {
+
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [showOtp, setShowOtp] = useState(false);
   const [keepLoggedIn, setKeepLoggedIn] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null); // For success messages like "OTP sent!"
+  const [loading, setLoading] = useState(false);
+  
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Function for the "Resend OTP" link
+  const handleRequestOtp = async () => {
+    if (!email) {
+      setError('Please enter your email first.');
+      return;
+    }
+    setError(null);
+    setMessage('Sending OTP...');
+    try {
+      const data = await requestLoginOtp(email);
+      setMessage(data.message); // Show success message from backend
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      }
+      setMessage(null);
+    }
+  };
+
+  // Function for the main "Sign In" button
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Logic for signing in will go here
-    console.log({ email, otp, keepLoggedIn });
+    setError(null);
+    setMessage(null);
+    setLoading(true);
+
+    try {
+      const data = await verifyOtp(email, otp);
+      login(data.token);
+      navigate('/dashboard');
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -94,9 +141,13 @@ const SignInPage: React.FC = () => {
               </div>
               
               <div className="flex items-center justify-between">
-                <a href="#" className="text-sm font-medium text-blue-600 hover:underline">
+                <button
+                  type="button"
+                  onClick={handleRequestOtp}
+                  className="text-sm font-medium text-blue-600 hover:underline"
+                >
                   Resend OTP
-                </a>
+                </button>
                 <div className="flex items-center">
                   <input
                     id="keep-logged-in"
@@ -112,12 +163,17 @@ const SignInPage: React.FC = () => {
                 </div>
               </div>
 
+              {/* Display feedback messages */}
+              {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+              {message && <p className="text-green-600 text-sm text-center">{message}</p>}
+
               <div>
                 <button
                   type="submit"
-                  className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-2.5 text-sm lg:text-lg font-semibold leading-6 text-white shadow-sm hover:bg-blue-500"
+                  disabled={loading}
+                  className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-2.5 text-sm lg:text-lg font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 disabled:bg-blue-400"
                 >
-                  Sign In
+                  {loading ? 'Signing In...' : 'Sign In'}
                 </button>
               </div>
             </form>
