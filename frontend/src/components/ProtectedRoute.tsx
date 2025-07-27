@@ -11,11 +11,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { token } = useAuth();
 
   if (!token) {
-    // If there's no token, redirect to the signup page
     return <Navigate to="/signup" />;
   }
 
-  // If there is a token, render the child components (e.g., the Dashboard)
   return <>{children}</>;
 };
 

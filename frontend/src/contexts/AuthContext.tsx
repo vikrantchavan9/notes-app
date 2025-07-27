@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { jwtDecode } from 'jwt-decode'; // We need a library to decode the JWT
+import { jwtDecode } from 'jwt-decode'; 
 
 interface AuthContextType {
   token: string | null;
@@ -16,7 +16,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<{ id: string; name: string; email: string } | null>(null);
 
   useEffect(() => {
-    // When the token changes, decode it to get user info.
     if (token) {
       const decodedUser: { id: string, name: string, email: string } = jwtDecode(token);
       setUser(decodedUser);
@@ -42,7 +41,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Custom hook to easily access the auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

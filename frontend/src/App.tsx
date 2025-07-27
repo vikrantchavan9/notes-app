@@ -7,14 +7,12 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
-    <AuthProvider> {/* Wrap the entire application */}
+    <AuthProvider> 
       <Router>
         <Routes>
-          {/* Public Routes */}
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/verify-otp" element={<OtpPage />} />
           
-          {/* Protected Route */}
           <Route 
             path="/dashboard"
             element={
