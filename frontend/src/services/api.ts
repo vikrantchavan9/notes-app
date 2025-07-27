@@ -20,6 +20,16 @@ apiClient.interceptors.request.use(
   }
 );
 
+const getErrorMessage = (error: unknown): string => {
+  if (axios.isAxiosError(error) && error.response?.data?.message) {
+    return error.response.data.message;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return 'An unknown error occurred.';
+};
+
 interface RegisterData {
   name: string;
   email: string;
@@ -30,8 +40,8 @@ export const registerUser = async (userData: RegisterData) => {
   try {
     const { data } = await apiClient.post('/users/register', userData);
     return data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || 'An error occurred during registration.');
+  } catch (error) {
+    throw new Error(getErrorMessage(error) || 'An error occurred during registration.');
   }
 };
 
@@ -39,8 +49,8 @@ export const verifyOtp = async (email: string, otp: string) => {
   try {
     const { data } = await apiClient.post('/users/verify-otp', { email, otp });
     return data; 
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || 'An error occurred during OTP verification.');
+  } catch (error) {
+    throw new Error(getErrorMessage(error) || 'An error occurred during OTP verification.');
   }
 };
 
@@ -48,8 +58,8 @@ export const getNotes = async () => {
     try {
         const { data } = await apiClient.get('/notes');
         return data;
-    } catch (error: any) {
-        throw new Error(error.response?.data?.message || 'Could not fetch notes.');
+    } catch (error) {
+        throw new Error(getErrorMessage(error) || 'Could not fetch notes.');
     }
 };
 
@@ -57,8 +67,8 @@ export const createNote = async (content: string) => {
     try {
         const { data } = await apiClient.post('/notes', { content });
         return data;
-    } catch (error: any) {
-        throw new Error(error.response?.data?.message || 'Could not create note.');
+    } catch (error) {
+        throw new Error(getErrorMessage(error) || 'Could not create note.');
     }
 };
 
@@ -66,7 +76,7 @@ export const deleteNote = async (noteId: string) => {
     try {
         const { data } = await apiClient.delete(`/notes/${noteId}`);
         return data;
-    } catch (error: any) {
-        throw new Error(error.response?.data?.message || 'Could not delete note.');
+    } catch (error) {
+        throw new Error(getErrorMessage(error) || 'Could not delete note.');
     }
 };

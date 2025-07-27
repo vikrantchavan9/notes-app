@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { getNotes, createNote, deleteNote } from '../services/api'; 
 import NoteItem from '../components/NoteItem'; 
@@ -24,8 +24,12 @@ const DashboardPage: React.FC = () => {
       try {
         const fetchedNotes = await getNotes();
         setNotes(fetchedNotes);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unknown error occurred while fetching notes.');
+        }
       } finally {
         setLoading(false);
       }
@@ -39,25 +43,33 @@ const DashboardPage: React.FC = () => {
     navigate('/signup');
   };
 
-  const handleCreateNote = async (e: React.FormEvent) => {
+    const handleCreateNote = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newNote.trim()) return;
 
     try {
       const createdNote = await createNote(newNote);
-      setNotes([createdNote, ...notes]); 
-      setNewNote(''); 
-    } catch (err: any) {
-      setError(err.message);
+      setNotes([createdNote, ...notes]);
+      setNewNote('');
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred while creating the note.');
+      }
     }
   };
 
   const handleDeleteNote = async (id: string) => {
     try {
       await deleteNote(id);
-      setNotes(notes.filter((note) => note._id !== id)); 
-    } catch (err: any) {
-      setError(err.message);
+      setNotes(notes.filter((note) => note._id !== id));
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred while deleting the note.');
+      }
     }
   };
 

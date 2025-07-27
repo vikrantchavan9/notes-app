@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { verifyOtp } from '../services/api'; // Import the new API function
-import { useAuth } from '../contexts/AuthContext'; // Import the useAuth hook
+import { verifyOtp } from '../services/api'; 
+import { useAuth } from '../hooks/useAuth';
 
 const OtpPage: React.FC = () => {
   const [otp, setOtp] = useState('');
@@ -10,25 +10,32 @@ const OtpPage: React.FC = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const email = location.state?.email;
   const { login } = useAuth(); 
+  const email = location.state?.email;
 
+  useEffect(() => {
     if (!email) {
-    navigate('/signup');
-    return null;
-  }
+      navigate('/signup');
+    }
+  }, [email, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email) return;
+
     setError(null);
     setLoading(true);
 
     try {
       const data = await verifyOtp(email, otp);
-      login(data.token);
-      navigate('/dashboard');
-    } catch (err: any) {
-      setError(err.message);
+      login(data.token); 
+      navigate('/dashboard'); 
+    } catch (err: unknown) { 
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred.');
+      }
     } finally {
       setLoading(false);
     }
@@ -62,7 +69,7 @@ const OtpPage: React.FC = () => {
               disabled={loading}
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300"
             >
-              {loading ? 'Verifying...' : 'Verify'}
+              {loading ? 'Verifying...' : 'Verify Account'}
             </button>
           </div>
         </form>
