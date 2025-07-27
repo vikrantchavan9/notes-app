@@ -1,17 +1,33 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SignupPage from './pages/Signup';
+import { AuthProvider } from './contexts/AuthContext';
 import OtpPage from './pages/OtpPage'; 
+import DashboardPage from './pages/DashboardPage'; 
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/verify-otp" element={<OtpPage />} /> {/* Add the new route */}
-        {/* We will add the dashboard and other routes later */}
-        <Route path="/" element={<SignupPage />} /> {/* Default route */}
-      </Routes>
-    </Router>
+    <AuthProvider> {/* Wrap the entire application */}
+      <Router>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/verify-otp" element={<OtpPage />} />
+          
+          {/* Protected Route */}
+          <Route 
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route path="/" element={<SignupPage />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

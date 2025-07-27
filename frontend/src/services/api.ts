@@ -21,3 +21,12 @@ export const registerUser = async (userData: RegisterData) => {
     throw new Error(error.response?.data?.message || 'An error occurred during registration.');
   }
 };
+
+export const verifyOtp = async (email: string, otp: string) => {
+  try {
+    const { data } = await apiClient.post('/users/verify-otp', { email, otp });
+    return data; // This will return the user object and the token
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'An error occurred during OTP verification.');
+  }
+};

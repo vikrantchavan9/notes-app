@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
 import logo from '../assets/icon.png'; 
 import abstractBg from '../assets/right-column.png';
-import { registerUser } from 'backend/src/services/api.ts';
+import { registerUser } from '../services/api';
 
 const SignupPage: React.FC = () => {
   const [name, setName] = useState('');
@@ -143,9 +143,10 @@ const SignupPage: React.FC = () => {
                 <div>
                   <button
                     type="submit"
-                    className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-2.5 text-sm lg:text-lg font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                    disabled={loading} // Disable button while loading
+                    className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-2.5 text-sm lg:text-lg font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:bg-blue-300"
                   >
-                    Get OTP
+                    {loading ? 'Sending...' : 'Get OTP'}
                   </button>
                 </div>
               </form>

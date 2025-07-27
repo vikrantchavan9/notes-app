@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { verifyOtp } from '../services/api'; // Import the new API function
+import { useAuth } from '../contexts/AuthContext'; // Import the useAuth hook
 
 const OtpPage: React.FC = () => {
   const [otp, setOtp] = useState('');
@@ -8,18 +10,28 @@ const OtpPage: React.FC = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const email = location.state?.email; 
+  const email = location.state?.email;
+  const { login } = useAuth(); 
 
-  if (!email) {
+    if (!email) {
     navigate('/signup');
+    return null;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    console.log(`Verifying OTP ${otp} for email ${email}`);
-    setLoading(false);
+
+    try {
+      const data = await verifyOtp(email, otp);
+      login(data.token);
+      navigate('/dashboard');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
