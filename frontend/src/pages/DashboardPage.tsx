@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getNotes, createNote, deleteNote } from '../services/api'; 
 import NoteItem from '../components/NoteItem'; 
 
@@ -11,23 +11,13 @@ interface Note {
 }
 
 const DashboardPage: React.FC = () => {
-  const { user, logout, login } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [newNote, setNewNote] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // This effect runs once on component mount to check for a token from Google
-  useEffect(() => {
-    const googleToken = searchParams.get('token');
-    if (googleToken) {
-      login(googleToken);
-      navigate('/dashboard', { replace: true });
-    }
-  }, [login, navigate, searchParams]);
 
   // This effect fetches notes after the user is confirmed
   useEffect(() => {
@@ -55,6 +45,7 @@ const DashboardPage: React.FC = () => {
     navigate('/signup');
   };
 
+  // Create a note
     const handleCreateNote = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newNote.trim()) return;
@@ -72,6 +63,7 @@ const DashboardPage: React.FC = () => {
     }
   };
 
+  // Delete a note
   const handleDeleteNote = async (id: string) => {
     try {
       await deleteNote(id);
