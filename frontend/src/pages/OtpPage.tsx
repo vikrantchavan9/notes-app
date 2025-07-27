@@ -10,14 +10,16 @@ const OtpPage: React.FC = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth(); 
+  const { login, token } = useAuth(); 
   const email = location.state?.email;
 
+   // This effect will run whenever the 'token' value changes.
   useEffect(() => {
-    if (!email) {
-      navigate('/signup');
+    // If a token becomes available, it means login was successful.
+    if (token) {
+      navigate('/dashboard', { replace: true }); // Navigate to the dashboard
     }
-  }, [email, navigate]);
+  }, [token, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,16 +30,18 @@ const OtpPage: React.FC = () => {
 
     try {
       const data = await verifyOtp(email, otp);
-      login(data.token); 
-      navigate('/dashboard'); 
-    } catch (err: unknown) { 
+
+            // --- DEBUGGING STEP 1: Check the API response ---
+      console.log('API Response received in OtpPage:', data);
+      
+      login(data.token);
+    } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
         setError('An unknown error occurred.');
       }
-    } finally {
-      setLoading(false);
+      setLoading(false); 
     }
   };
 

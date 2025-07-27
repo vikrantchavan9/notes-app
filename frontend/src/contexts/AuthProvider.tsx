@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { AuthContext } from './auth-context';
@@ -8,6 +8,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<{ id: string; name: string; email: string } | null>(null);
 
   useEffect(() => {
+    console.log('AuthContext Effect: Token has changed to ->', token);
+
     if (token) {
       try {
         const decodedUser: { id: string, name: string, email: string } = jwtDecode(token);
@@ -21,18 +23,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(null);
       localStorage.removeItem('token');
     }
-  }, [token]);
+  }, [token]); 
 
-  const login = (newToken: string) => {
+  const login = useCallback((newToken: string) => {
+
+        // --- DEBUGGING STEP 2: Check if login function is called with the token ---
+    console.log('AuthProvider login function called with token:', newToken);
+    
     setToken(newToken);
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setToken(null);
-  };
+  }, []);
+
+  const value = useMemo(() => ({
+    token,
+    user,
+    login,
+    logout
+  }), [token, user, login, logout]);
 
   return (
-    <AuthContext.Provider value={{ token, user, login, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

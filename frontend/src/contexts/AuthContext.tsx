@@ -1,6 +1,5 @@
 import { createContext } from 'react';
 
-// Define the shape of the context's value
 export interface AuthContextType {
   token: string | null;
   user: { id: string; name: string; email: string } | null;
@@ -8,5 +7,4 @@ export interface AuthContextType {
   logout: () => void;
 }
 
-// Create and export the context
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);

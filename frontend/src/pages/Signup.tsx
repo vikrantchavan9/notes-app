@@ -30,6 +30,9 @@ const SignupPage: React.FC = () => {
     setError(null); 
     setLoading(true);
 
+    // LOGIN DEBUGGING STEP #1 
+    console.log("STEP 1: "+ name +" : "+ dob +" : "+ email)
+
     if (!name || !dob || !email) {
       setError('All fields are required.');
       setLoading(false);
@@ -188,7 +191,7 @@ const SignupPage: React.FC = () => {
 
               <p className="mt-10 text-center text-sm lg:text-lg text-gray-500">
                 Already have an account??{' '}
-                <a href="#" className="font-semibold leading-6 text-blue-600 hover:text-blue-500">
+                <a href="/signin" className="font-semibold leading-6 text-blue-600 hover:text-blue-500">
                   Sign in
                 </a>
               </p>

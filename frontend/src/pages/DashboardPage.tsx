@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getNotes, createNote, deleteNote } from '../services/api'; 
 import NoteItem from '../components/NoteItem'; 
 
@@ -11,15 +11,27 @@ interface Note {
 }
 
 const DashboardPage: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [newNote, setNewNote] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // This effect runs once on component mount to check for a token from Google
   useEffect(() => {
+    const googleToken = searchParams.get('token');
+    if (googleToken) {
+      login(googleToken);
+      navigate('/dashboard', { replace: true });
+    }
+  }, [login, navigate, searchParams]);
+
+  // This effect fetches notes after the user is confirmed
+  useEffect(() => {
+    // Only fetch notes if we have a user
     const fetchNotes = async () => {
       try {
         const fetchedNotes = await getNotes();

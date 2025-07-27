@@ -10,7 +10,8 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { token } = useAuth();
 
-  if (!token) {
+   if (!token) {
+    console.log('No token found! Redirecting to /signup.');
     return <Navigate to="/signup" />;
   }
 

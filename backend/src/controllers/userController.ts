@@ -6,10 +6,12 @@ import generateToken from '../utils/generateToken';
 
 export const registerUser = async (req: Request, res: Response) => {
     const { name, email, dob } = req.body;
-
+    
     if (!name || !email || !dob) {
         return res.status(400).json({ message: 'Please provide all required fields' });
     }
+
+    console.log("STEP 2: "+ name +" : "+ dob +" : "+ email)
 
     const userExists = await User.findOne({ email });
 
@@ -25,6 +27,8 @@ export const registerUser = async (req: Request, res: Response) => {
 
     const otpExpires = new Date(Date.now() + 10 * 60 * 1000); 
 
+    console.log("STEP 3: ", otp , otpExpires)
+
     const user = new User({
         name,
         email,
@@ -32,6 +36,8 @@ export const registerUser = async (req: Request, res: Response) => {
         otp,
         otpExpires,
     });
+
+    console.log("STEP 4: ", user)
 
     try {
         await user.save();
