@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
-import logo from '../assets/icon.png'; 
+import DatePicker from 'react-datepicker';
+import { format } from 'date-fns';
+import 'react-datepicker/dist/react-datepicker.css';
+
+import logo from '../assets/icon.png';
 import abstractBg from '../assets/right-column.png';
 import { registerUser } from '../services/api';
 
@@ -17,7 +21,7 @@ const SignupPage: React.FC = () => {
 );
 
   const [name, setName] = useState('');
-  const [dob, setDob] = useState(''); 
+  const [dob, setDob] = useState<Date | null>(null);
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null); 
   const [loading, setLoading] = useState(false);
@@ -27,11 +31,8 @@ const SignupPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null); 
+    setError(null);
     setLoading(true);
-
-    // LOGIN DEBUGGING STEP #1 
-    console.log("STEP 1: "+ name +" : "+ dob +" : "+ email)
 
     if (!name || !dob || !email) {
       setError('All fields are required.');
@@ -40,7 +41,10 @@ const SignupPage: React.FC = () => {
     }
 
     try {
-      await registerUser({ name, email, dob });
+      // Format dob to YYYY-MM-DD for API (backend expects this)
+      const formattedDob = dob ? format(dob, 'yyyy-MM-dd') : '';
+
+      await registerUser({ name, email, dob: formattedDob });
       navigate('/verify-otp', { state: { email } });
     } catch (err) {
       if (err instanceof Error) {
@@ -116,28 +120,34 @@ const SignupPage: React.FC = () => {
                   />
                 </div>
 
-                {/* Date of Birth Input */}
-                <div className="relative group">
-                  <label
-                    htmlFor="dob"
-                    className="absolute -top-2.5 left-2 z-10 inline-block bg-white px-1 text-sm font-medium text-gray-600 group-focus-within:text-blue-600"
-                  >
-                    Date of Birth
-                  </label>
-                  <div className="relative">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <Calendar className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                    </div>
-                    <input
-                        id="dob"
-                        name="dob"
-                        type="date"
-                        value={dob}
-                        onChange={(e) => setDob(e.target.value)}
-                        className="block w-full rounded-md border-0 py-2.5 pl-10 pr-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm lg:text-lg"
-                    />
-                  </div>
+                 {/* Date of Birth Input*/}
+            <div className="relative group">
+              <label
+                htmlFor="dob"
+                className="absolute -top-2.5 left-2 z-10 inline-block bg-white px-1 text-sm font-medium text-gray-600 group-focus-within:text-blue-600"
+              >
+                Date of Birth
+              </label>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <Calendar className="h-5 w-5 text-gray-400" aria-hidden="true" />
                 </div>
+                <DatePicker
+                  id="dob"
+                  selected={dob}
+                  onChange={date => setDob(date)}
+                  dateFormat="dd MMMM yyyy"
+                  placeholderText="11 December 1997"
+                  maxDate={new Date()}
+                  showMonthDropdown
+                  showYearDropdown
+                  dropdownMode="select"
+                  className="block w-full rounded-md border-0 py-2.5 pl-10 pr-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm lg:text-lg"
+                  popperClassName="z-50"
+                  autoComplete="off"
+                />
+              </div>
+            </div>
 
                 {/* Email Input */}
                 <div className="relative group">

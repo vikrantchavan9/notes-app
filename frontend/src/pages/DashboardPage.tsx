@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { getNotes, createNote, deleteNote } from '../services/api'; 
-import NoteItem from '../components/NoteItem'; 
+import { getNotes, createNote, deleteNote } from '../services/api';
+import LogoIcon from '../assets/icon.png';
+import { Trash2 } from 'lucide-react';
 
 interface Note {
   _id: string;
@@ -19,24 +20,19 @@ const DashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // This effect fetches notes after the user is confirmed
+  const [isCreating, setIsCreating] = useState(false);
+
   useEffect(() => {
-    // Only fetch notes if we have a user
     const fetchNotes = async () => {
       try {
         const fetchedNotes = await getNotes();
         setNotes(fetchedNotes);
       } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError('An unknown error occurred while fetching notes.');
-        }
+        setError((err instanceof Error) ? err.message : 'An unknown error occurred while fetching notes.');
       } finally {
         setLoading(false);
       }
     };
-
     fetchNotes();
   }, []);
 
@@ -45,80 +41,140 @@ const DashboardPage: React.FC = () => {
     navigate('/signup');
   };
 
-  // Create a note
-    const handleCreateNote = async (e: React.FormEvent) => {
+  const handleCreateNoteSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newNote.trim()) return;
-
     try {
       const createdNote = await createNote(newNote);
       setNotes([createdNote, ...notes]);
       setNewNote('');
+      setIsCreating(false);
+      setError(null);
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred while creating the note.');
-      }
+      setError((err instanceof Error) ? err.message : 'An unknown error occurred while creating the note.');
     }
   };
 
-  // Delete a note
   const handleDeleteNote = async (id: string) => {
     try {
       await deleteNote(id);
       setNotes(notes.filter((note) => note._id !== id));
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred while deleting the note.');
-      }
+      setError((err instanceof Error) ? err.message : 'An unknown error occurred while deleting the note.');
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4 lg:p-8">
-      <header className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold">Welcome, {user?.name}!</h1>
-          <p className="mt-1 text-gray-600">Here are your notes.</p>
-        </div>
-        <button 
-          onClick={handleLogout}
-          className="bg-red-500 text-white font-bold py-2 px-4 rounded hover:bg-red-700 transition-colors"
-        >
-          Logout
-        </button>
-      </header>
-
-      <div className="mb-8">
-        <form onSubmit={handleCreateNote} className="flex gap-2">
-          <input
-            type="text"
-            value={newNote}
-            onChange={(e) => setNewNote(e.target.value)}
-            placeholder="Create a new note..."
-            className="flex-grow p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+    <div className="min-h-screen bg-white flex flex-col items-center px-4 py-10
+                    sm:px-6 md:px-10 lg:px-16 xl:px-24 2xl:px-40">
+      {/* --- Header --- */}
+      <div className="w-full max-w-4xl flex justify-between items-center mb-10">
+        {/* Logo + Dashboard row */}
+        <div className="flex items-center gap-3">
+          <img
+            src={LogoIcon}
+            alt="Logo"
+            className="h-8 w-8"
           />
-          <button
-            type="submit"
-            className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
-          >
-            Add Note
-          </button>
-        </form>
+          <span className="text-xl font-medium text-gray-900 md:text-2xl">Dashboard</span>
+        </div>
+        {/* Sign Out Link */}
+        <button
+          onClick={handleLogout}
+          className="text-[#367AFF] underline text-sm font-bold hover:text-blue-600 md:text-base"
+        >
+          Sign Out
+        </button>
       </div>
 
-      <div className="space-y-4">
-        {loading && <p>Loading notes...</p>}
-        {error && <p className="text-red-500">{error}</p>}
-        {!loading && notes.length === 0 && (
-          <p className="text-gray-500 text-center py-10">You don't have any notes yet. Add one above!</p>
+      {/* --- Profile Card --- */}
+      <div className="w-full max-w-4xl">
+        <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6 mb-6
+                        md:p-8 md:mb-8">
+          <div className="text-xl font-bold mb-2 md:text-3xl">
+            Welcome, {user?.name || 'User'} !
+          </div>
+          <div className="text-gray-800 text-md md:text-lg">
+            Email: {user?.email || 'xxxxxx@xxxx.com'}
+          </div>
+        </div>
+
+        {/* --- Create Note Area --- */}
+        {!isCreating ? (
+          <button
+            className="w-full max-w-sm bg-[#367AFF] hover:bg-blue-500 text-white py-3 rounded-lg font-semibold text-base shadow mb-8
+                       md:max-w-md md:py-4 md:text-lg"
+            onClick={() => setIsCreating(true)}
+            disabled={loading}
+          >
+            Create Note
+          </button>
+        ) : (
+          <form onSubmit={handleCreateNoteSubmit} className="mb-8 w-full max-w-4xl flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
+            <input
+              type="text"
+              value={newNote}
+              onChange={(e) => setNewNote(e.target.value)}
+              placeholder="Type your note here..."
+              className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-base md:flex-grow md:text-lg"
+              autoFocus
+            />
+            <div className="flex gap-3 md:flex-none">
+              <button
+                type="submit"
+                className="bg-[#367AFF] text-white font-semibold px-6 py-2.5 rounded-lg shadow hover:bg-blue-500 transition md:px-8 md:py-3 md:text-lg"
+              >
+                Add Note
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCreating(false);
+                  setNewNote('');
+                  setError(null);
+                }}
+                className="bg-gray-300 text-gray-700 font-semibold px-4 py-2.5 rounded-lg shadow hover:bg-gray-400 transition md:px-6 md:py-3 md:text-lg"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
         )}
-        {notes.map((note) => (
-          <NoteItem key={note._id} note={note} onDelete={handleDeleteNote} />
-        ))}
+      </div>
+
+      {/* --- Notes Section --- */}
+      <div className="w-full max-w-4xl">
+        <div className="text-lg font-medium mb-4 text-gray-800 md:text-xl">
+          Notes
+        </div>
+        <div className="space-y-4">
+          {loading && (
+            <div className="text-gray-400 text-center py-6">Loading notes...</div>
+          )}
+          {error && (
+            <div className="text-red-500 text-center py-6">{error}</div>
+          )}
+          {!loading && notes.length === 0 && (
+            <div className="text-gray-400 text-center py-6">No notes yet.</div>
+          )}
+          {/* Notes */}
+          {notes.map((note) => (
+            <div
+              key={note._id}
+              className="flex items-center justify-between bg-white rounded-lg shadow-md px-6 py-3 border border-gray-100
+                          md:px-8 md:py-4"
+            >
+              <span className="text-gray-900 text-base md:text-lg">{note.content}</span>
+              <button
+                onClick={() => handleDeleteNote(note._id)}
+                className="ml-2 p-2 rounded hover:bg-gray-100 transition"
+                title="Delete note"
+              >
+                <Trash2 className="h-6 w-6 text-gray-500" />
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
