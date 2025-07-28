@@ -8,6 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import logo from '../assets/icon.png';
 import abstractBg from '../assets/right-column.png';
 import { registerUser } from '../services/api';
+import axios from 'axios';
 
 const SignupPage: React.FC = () => {
 
@@ -28,35 +29,73 @@ const SignupPage: React.FC = () => {
 
   const navigate = useNavigate();
 
+   const validateName = (name: string) => {
+    // Name must contain only letters and spaces
+    return /^[A-Za-z\s]+$/.test(name.trim());
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+  e.preventDefault();
+  setError(null);
 
-    if (!name || !dob || !email) {
-      setError('All fields are required.');
-      setLoading(false);
-      return;
-    }
+  if (!name) {
+    setError('Name is required.');
+    return;
+  }
 
-    try {
-      // Format dob to YYYY-MM-DD for API (backend expects this)
-      const formattedDob = dob ? format(dob, 'yyyy-MM-dd') : '';
+  if (!validateName(name)) {
+    setError('Name must contain only letters and spaces.');
+    return;
+  }
 
-      await registerUser({ name, email, dob: formattedDob });
-      navigate('/verify-otp', { state: { email } });
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
+  if (!dob) {
+    setError('Date of Birth is required.');
+    return;
+  }
+
+  if (!email) {
+    setError('Email is required.');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const formattedDob = dob ? format(dob, 'yyyy-MM-dd') : '';
+
+    await registerUser({ name, email, dob: formattedDob });
+
+    // On success navigate to OTP verification page
+    navigate('/verify-otp', { state: { email } });
+  } catch (err: unknown) {
+    console.error('Signup error:', err);
+
+    if (axios.isAxiosError(err) && err.response) {
+      const message =
+        (err.response.data && (err.response.data.message || err.response.data.error)) ||
+        'An error occurred';
+
+      if (typeof message === 'string') {
+        const msgLower = message.toLowerCase();
+        if (msgLower.includes('account with the email already exists')) {
+          setError('Account with the email already exists.');
+        } else if (msgLower.includes('otp') || msgLower.includes('verify')) {
+          setError('There was an error sending OTP. Please try again.');
+        } else {
+          setError(message);
+        }
       } else {
         setError('An unknown error occurred.');
       }
-    } finally {
-      setLoading(false);
+    } else if (err instanceof Error) {
+      setError(err.message);
+    } else {
+      setError('An unknown error occurred.');
     }
-  };
-
+  } finally {
+    setLoading(false);
+  }
+};
       const handleGoogleSignIn = () => {
 
     const API_ROOT_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
@@ -150,6 +189,7 @@ const SignupPage: React.FC = () => {
                   className="block w-full rounded-md border-0 py-2.5 pl-10 pr-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm lg:text-lg"
                   popperClassName="z-50"
                   autoComplete="off"
+                  onKeyDown={(e) => e.preventDefault()}
                 />
               </div>
             </div>

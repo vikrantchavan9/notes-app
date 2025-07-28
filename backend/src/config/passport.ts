@@ -2,7 +2,7 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { User, IUser } from '../models/User';
 
-const callbackURL = `${process.env.RENDER_EXTERNAL_URL || 'http://localhost:5000'}/api/users/google/callback`;
+const callbackURL = `http://localhost:5000/api/users/google/callback`;
 
 console.log('--- PASSPORT GOOGLE STRATEGY ---');
 console.log('Using Callback URL:', callbackURL);
