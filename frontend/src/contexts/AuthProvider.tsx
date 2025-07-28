@@ -4,7 +4,11 @@ import { jwtDecode } from 'jwt-decode';
 import { AuthContext } from './auth-context';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
+
+  // The initial token is can read from both localStorage and sessionStorage
+  const [token, setToken] = useState<string | null>(() => {
+    return localStorage.getItem('token') || sessionStorage.getItem('token');
+  });
   const [user, setUser] = useState<{ id: string; name: string; email: string } | null>(null);
 
   useEffect(() => {
@@ -22,14 +26,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } else {
       setUser(null);
       localStorage.removeItem('token');
+      sessionStorage.removeItem('token');
     }
   }, [token]); 
 
-  const login = useCallback((newToken: string) => {
-
-        // --- DEBUGGING STEP 2: Check if login function is called with the token ---
-    console.log('AuthProvider login function called with token:', newToken);
-    
+  // The login function now decides where to save the token
+  const login = useCallback((newToken: string, remember: boolean) => {
+    if (remember) {
+      localStorage.setItem('token', newToken);
+    } else {
+      sessionStorage.setItem('token', newToken);
+    }
     setToken(newToken);
   }, []);
 

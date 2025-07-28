@@ -15,7 +15,7 @@ const SignInPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [showOtp, setShowOtp] = useState(false);
-  const [keepLoggedIn, setKeepLoggedIn] = useState(false);
+  const [keepLoggedIn, setKeepLoggedIn] = useState(false); 
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null); // For success messages like "OTP sent!"
   const [loading, setLoading] = useState(false);
@@ -51,7 +51,7 @@ const SignInPage: React.FC = () => {
 
     try {
       const data = await verifyOtp(email, otp);
-      login(data.token);
+      login(data.token, keepLoggedIn);
       navigate('/dashboard');
     } catch (err) {
       if (err instanceof Error) {
@@ -130,7 +130,7 @@ const SignInPage: React.FC = () => {
                     onClick={() => setShowOtp(!showOtp)}
                     className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
                   >
-                    {/* --- THIS IS THE UPDATED LOGIC --- */}
+                    {/* --- Toggle Eye icon --- */}
                     {showOtp ? (
                       <img src={EyeClosedIcon} alt="Hide OTP" className="w-5 h-5" />
                     ) : (
