@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+// Set up axios to talk to the backend
 const apiClient = axios.create({
   baseURL: 'http://localhost:5000/api', 
   headers: {
@@ -7,6 +8,7 @@ const apiClient = axios.create({
   },
 });
 
+// Add the token to every request if it exists
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -20,6 +22,7 @@ apiClient.interceptors.request.use(
   }
 );
 
+// Get a simple error message from any error
 const getErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error) && error.response?.data?.message) {
     return error.response.data.message;
@@ -36,6 +39,7 @@ interface RegisterData {
   dob: string;
 }
 
+// Register a new user
 export const registerUser = async (userData: RegisterData) => {
   try {
     const { data } = await apiClient.post('/users/register', userData);
@@ -45,6 +49,7 @@ export const registerUser = async (userData: RegisterData) => {
   }
 };
 
+// Ask for a login code (OTP)
 export const requestLoginOtp = async (email: string) => {
     try {
         const { data } = await apiClient.post('/users/login', { email });
@@ -57,6 +62,7 @@ export const requestLoginOtp = async (email: string) => {
     }
 };
 
+// Check if the OTP is correct
 export const verifyOtp = async (email: string, otp: string) => {
   try {
     const { data } = await apiClient.post('/users/verify-otp', { email, otp });
@@ -66,6 +72,7 @@ export const verifyOtp = async (email: string, otp: string) => {
   }
 };
 
+// Get all notes for the user
 export const getNotes = async () => {
     try {
         const { data } = await apiClient.get('/notes');
@@ -75,6 +82,7 @@ export const getNotes = async () => {
     }
 };
 
+// Make a new note
 export const createNote = async (content: string) => {
     try {
         const { data } = await apiClient.post('/notes', { content });
@@ -84,6 +92,7 @@ export const createNote = async (content: string) => {
     }
 };
 
+// Delete a note by its ID
 export const deleteNote = async (noteId: string) => {
     try {
         const { data } = await apiClient.delete(`/notes/${noteId}`);

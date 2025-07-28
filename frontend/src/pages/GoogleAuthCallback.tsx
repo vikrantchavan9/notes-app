@@ -13,7 +13,7 @@ const GoogleAuthCallback: React.FC = () => {
     
     if (token) {
       // If a token is found in the URL, save it using our login function
-      login(token);
+      login(token, false);
       // Then, navigate to the secure dashboard
       navigate('/dashboard', { replace: true });
     } else {
