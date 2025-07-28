@@ -164,8 +164,8 @@ const SignInPage: React.FC = () => {
               </div>
 
               {/* Display feedback messages */}
-              {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-              {message && <p className="text-green-600 text-sm text-center">{message}</p>}
+              {error && <p className="text-blue-600 text-sm text-center">{error}</p>}
+              {message && <p className="text-blue-600 text-sm text-center">{message}</p>}
 
               <div>
                 <button
