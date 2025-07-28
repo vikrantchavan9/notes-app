@@ -56,30 +56,21 @@ export const registerUser = async (req: Request, res: Response) => {
 export const verifyOtp = async (req: Request, res: Response) => {
     const { email, otp } = req.body;
 
-    if (!email || !otp) {
-        return res.status(400).json({ message: 'Email and OTP are required' });
-    }
-
-    const user = await User.findOne({ 
-        email, 
-        otp, 
-        otpExpires: { $gt: new Date() } 
-    });
+    const user = await User.findOne<IUser>({ email, otp, otpExpires: { $gt: new Date() } });
 
     if (!user) {
-        return res.status(400).json({ message: 'Invalid OTP or it has expired.' });
+        return res.status(400).json({ message: 'Invalid OTP or OTP has expired' });
     }
 
     user.otp = undefined;
     user.otpExpires = undefined;
     await user.save();
 
-    res.status(200).json({
+    res.json({
         _id: user._id,
         name: user.name,
         email: user.email,
-        dob: user.dob,
-        token: generateToken(user._id.toString()),
+        token: generateToken(user),
     });
 };
 
