@@ -58,7 +58,8 @@ const SignupPage: React.FC = () => {
   };
 
     const handleGoogleSignIn = () => {
-    window.location.href = 'http://localhost:5000/api/users/google';
+    const googleAuthUrl = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/users/google`;
+    window.location.href = googleAuthUrl;
   };
 
   return (
