@@ -57,8 +57,12 @@ const SignupPage: React.FC = () => {
     }
   };
 
-    const handleGoogleSignIn = () => {
-    const googleAuthUrl = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/users/google`;
+      const handleGoogleSignIn = () => {
+
+    const API_ROOT_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+    
+    const googleAuthUrl = `${API_ROOT_URL}/api/users/google`;
+    
     window.location.href = googleAuthUrl;
   };
 
