@@ -34,7 +34,7 @@ const OtpPage: React.FC = () => {
             // --- DEBUGGING STEP 1: Check the API response ---
       console.log('API Response received in OtpPage:', data);
       
-      login(data.token);
+      login(data.token, false);
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
