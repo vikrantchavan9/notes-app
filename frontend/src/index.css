@@ -1,1 +1,20 @@
 @import "tailwindcss";
+
+.custom-toast {
+  color: black !important;
+}
+
+.custom-toast .Toastify__toast-icon > svg {
+  fill: #367AFF !important;
+  color: #367AFF !important;
+}
+
+/* Make the progress bar blue on your custom toasts */
+.custom-toast .Toastify__progress-bar {
+  background: #367AFF !important;
+}
+
+.custom-toast:focus {
+  outline-color: #367AFF !important;
+  box-shadow: 0 0 0 2px #367AFF99;
+}

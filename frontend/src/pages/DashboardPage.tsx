@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { getNotes, createNote, deleteNote } from '../services/api';
 import LogoIcon from '../assets/icon.png';
 import { Trash2 } from 'lucide-react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 interface Note {
   _id: string;
@@ -14,6 +17,8 @@ interface Note {
 const DashboardPage: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+    // console.log('User object in Dashboard:', user);
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [newNote, setNewNote] = useState('');
@@ -42,31 +47,53 @@ const DashboardPage: React.FC = () => {
   };
 
   const handleCreateNoteSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newNote.trim()) return;
-    try {
-      const createdNote = await createNote(newNote);
-      setNotes([createdNote, ...notes]);
-      setNewNote('');
-      setIsCreating(false);
-      setError(null);
-    } catch (err) {
-      setError((err instanceof Error) ? err.message : 'An unknown error occurred while creating the note.');
-    }
-  };
+  e.preventDefault();
+  if (!newNote.trim()) return;
+  try {
+    const createdNote = await createNote(newNote);
+    setNotes([createdNote, ...notes]);
+    setNewNote('');
+    setIsCreating(false);
+    setError(null);
+
+    // Show success toast
+    toast.success('Note created successfully!', { className: 'custom-toast' });
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : 'An unknown error occurred while creating the note.';
+    setError(errorMsg);
+    toast.error(`Error: ${errorMsg}`, { className: 'custom-toast' });
+  }
+};
 
   const handleDeleteNote = async (id: string) => {
-    try {
-      await deleteNote(id);
-      setNotes(notes.filter((note) => note._id !== id));
-    } catch (err) {
-      setError((err instanceof Error) ? err.message : 'An unknown error occurred while deleting the note.');
-    }
-  };
+  try {
+    await deleteNote(id);
+    setNotes(notes.filter((note) => note._id !== id));
+    toast.success('Note deleted successfully!', { className: 'custom-toast' });
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : 'An unknown error occurred while deleting the note.';
+    setError(errorMsg);
+    toast.error(`Error: ${errorMsg}`, { className: 'custom-toast' });
+  }
+};
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center px-4 py-10
                     sm:px-6 md:px-10 lg:px-16 xl:px-24 2xl:px-40">
+
+     <ToastContainer 
+      position="bottom-right"
+      autoClose={3000}
+      hideProgressBar={false}
+      newestOnTop
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme="light"
+    />
+
       {/* --- Header --- */}
       <div className="w-full max-w-4xl flex justify-between items-center mb-10">
         {/* Logo + Dashboard row */}
