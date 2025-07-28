@@ -2,12 +2,18 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { User, IUser } from '../models/User';
 
+const callbackURL = `${process.env.RENDER_EXTERNAL_URL || 'http://localhost:5000'}/api/users/google/callback`;
+
+console.log('--- PASSPORT GOOGLE STRATEGY ---');
+console.log('Using Callback URL:', callbackURL);
+console.log('--------------------------------');
+
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      callbackURL: '/api/users/google/callback',
+      callbackURL: callbackURL,
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
