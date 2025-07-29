@@ -153,7 +153,7 @@ const SignInPage: React.FC = () => {
               <div className="relative group">
                 <label
                   htmlFor="email"
-                  className="absolute -top-2.5 left-2 z-10 inline-block bg-white px-1 text-sm font-medium text-blue-600"
+                  className="absolute -top-2.5 left-2 z-10 inline-block bg-white px-1 text-sm font-medium text-gray-600 group-focus-within:text-blue-600"
                 >
                   Email
                 </label>
@@ -164,7 +164,7 @@ const SignInPage: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="jonas_kahnwald@gmail.com"
-                  className="block w-full rounded-md border-0 py-2.5 px-3 text-gray-900 shadow-sm ring-2 ring-inset ring-blue-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm lg:text-lg"
+                  className="block w-full rounded-md border-0 py-2.5 px-3 text-gray-900 shadow-sm ring-2 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm lg:text-lg"
                   aria-invalid={!!error && (!email.trim() || !isValidEmail(email))}
                   aria-describedby="email-error"
                 />

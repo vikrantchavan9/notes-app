@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+.custom-calendar-pop { z-index: 9999 !important; }
+
 .custom-toast {
   color: black !important;
 }
@@ -17,4 +19,17 @@
 .custom-toast:focus {
   outline-color: #367AFF !important;
   box-shadow: 0 0 0 2px #367AFF99;
+}
+
+/* Remove all default browser styling for inputs/buttons/selects */
+input,
+select,
+textarea {
+  outline: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
 }
